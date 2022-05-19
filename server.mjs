@@ -3,7 +3,6 @@ import cors from 'cors';
 import morgan from 'morgan';
 import mongoose from 'mongoose';
 import Students from './src/models/students.mjs';
-import { response } from 'express';
 
 const app = express();
 const port = process.env.PORT || 3000;
