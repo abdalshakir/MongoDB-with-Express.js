@@ -3,6 +3,7 @@ import cors from 'cors';
 import morgan from 'morgan';
 import mongoose from 'mongoose';
 import Students from './src/models/students.mjs';
+import { response } from 'express';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -25,8 +26,8 @@ mongoose.connect('mongodb://localhost:27017/school',
 
 // Create Students in Database
 app.post('/students', (req, res) => {
-    Students.create(req.body).then((data) => {
-        res.status(201).send(data)
+    Students.create(req.body).then((response) => {
+        res.status(201).send(response)
     }).catch((err) => {
         res.status(400).send(err)
     })
@@ -34,8 +35,8 @@ app.post('/students', (req, res) => {
 
 // Get all Students from Database
 app.get('/students', (req, res) => {
-    Students.find({}).then((data) => {
-        res.send(data)
+    Students.find({}).then((response) => {
+        res.send(response)
     }).catch((err) => {
         res.status(500).send(err)
     })
@@ -44,21 +45,53 @@ app.get('/students', (req, res) => {
 // Get One Student by Id
 app.get('/student/:id', (req, res) => {
     // ----- First Method -----
-    // Students.findById(req.params.id).then((data) => {
-    //     if (!data) {
-    //         res.status(404).send()
-    //     }
-    //     res.send(data)
-    // }).catch((err) => {
-    //     res.status(500).send(err)
-    // })
-
-    // ----- Second Method -----
-    Students.findOne({ _id: req.params.id }).then((data) => {
-        if (!data) {
+    Students.findById(req.params.id).then((response) => {
+        if (!response) {
             res.status(404).send()
         }
-        res.send(data)
+        res.send(response)
+    }).catch((err) => {
+        res.status(500).send(err)
+    })
+
+    // ----- Second Method -----
+    Students.findOne({ _id: req.params.id }).then((response) => {
+        if (!response) {
+            res.status(404).send()
+        }
+        res.send(response)
+    }).catch((err) => {
+        res.status(500).send(err)
+    })
+})
+
+// Update Any Student's response
+app.patch('/student/:id', (req, res) => {
+    // ----- First Method -----
+    Students.findByIdAndUpdate(req.params.id, req.body, { new: true }).then((response) => {
+        if (!response) {
+            res.status(404).send()
+        }
+        res.send(response)
+    }).catch((err) => {
+        res.status(500).send(err)
+    })
+
+    // ----- Second Method -----
+    Students.updateOne({_id: req.params.id}, req.body).then((response) => {
+        res.status(200).send(response)
+    }).catch((err) => {
+        res.status(500).send(err)
+    })
+})
+
+// Delete Any Student's Data
+app.delete('/student/:id', (req, res) => {
+    Students.findOneAndDelete(req.params.body).then((response) => {
+        if(!response){
+            res.status(400).send()
+        }
+        res.send(response)
     }).catch((err) => {
         res.status(500).send(err)
     })
